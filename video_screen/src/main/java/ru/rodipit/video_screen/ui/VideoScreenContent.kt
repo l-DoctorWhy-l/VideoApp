@@ -3,6 +3,11 @@ package ru.rodipit.video_screen.ui
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.os.Build
+import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
+import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Box
@@ -30,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -48,7 +54,6 @@ import ru.rodipit.design.shimmers.shimmerEffect
 private const val RESTORE_CONFIGURATION_SETTINGS_FROM_LANDSCAPE_DELAY = 1000L
 private const val RESTORE_CONFIGURATION_SETTINGS_FROM_PORTRAIT_DELAY = 2000L
 
-@OptIn(UnstableApi::class)
 @Composable
 internal fun VideoScreenContent(
     uiState: State<VideoScreenUiData>,
@@ -88,16 +93,41 @@ private fun VideoScreen(
     val localContext = LocalContext.current
     val configuration = LocalConfiguration.current
     val activity = remember { (localContext as Activity) }
+    val view = LocalView.current
     var fullScreenModeEnabled by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(fullScreenModeEnabled) {
         when (fullScreenModeEnabled) {
             true -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    activity.window.insetsController?.let { insetsController ->
+                        insetsController.systemBarsBehavior =
+                            WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        insetsController.hide(WindowInsets.Type.systemBars())
+                    }
+                } else {
+                    activity.window.setFlags(
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN
+                    )
+                    view.systemUiVisibility =
+                        (
+                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                            View.SYSTEM_UI_FLAG_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        )
+                }
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
                 delay(RESTORE_CONFIGURATION_SETTINGS_FROM_LANDSCAPE_DELAY)
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
             }
             false -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    activity.window.insetsController?.show(WindowInsets.Type.systemBars())
+                } else {
+                    activity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    view.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                }
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
                 delay(RESTORE_CONFIGURATION_SETTINGS_FROM_PORTRAIT_DELAY)
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
