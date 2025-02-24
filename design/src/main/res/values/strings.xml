@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loading_failed_message">Loading Failed(</string>
+    <string name="refreshing_failed_message">Refreshing failed(</string>
+    <string name="formatted_message">Hello, %s!</string>
+</resources>
