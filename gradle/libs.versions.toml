@@ -11,7 +11,6 @@ composeBom = "2025.02.00"
 media3Exoplayer = "1.5.1"
 navigationCompose = "2.8.7"
 ksp = "2.0.21-1.0.25"
-kapt = "2.1.10"
 koin-bom = "4.0.2"
 gson = "2.11.0"
 coil = "2.7.0"
@@ -67,6 +66,3 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
-
-
